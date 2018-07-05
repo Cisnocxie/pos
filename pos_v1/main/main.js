@@ -26,7 +26,6 @@ function countItemNum(tags) {
             itemNum[tagsCopy[i]] += num;
         }
     }
-    console.info(itemNum);
     return itemNum;
 }
 
@@ -39,7 +38,6 @@ function getItemDetail(itemNum, allItems) {
             itemDetail.push(allItemDetail[i]);
         }
     }
-    console.info(itemDetail);
     return itemDetail;
 }
 
@@ -59,7 +57,6 @@ function getItemDiscount(itemDetail, promotion) {
             addItemDiscount[i].discount = 0;
         }
     }
-    console.info(addItemDiscount);
     return addItemDiscount;
 }
 
@@ -68,7 +65,6 @@ function countItemLittlePrice(addItemDiscount) {
     for (let i = 0; i < addItemLittlePrice.length; i++) {
         addItemLittlePrice[i].littlePrice = addItemLittlePrice[i].price * addItemLittlePrice[i].num - addItemLittlePrice[i].discount;
     }
-    console.info(addItemLittlePrice);
     return addItemLittlePrice;
 }
 
@@ -79,7 +75,6 @@ function countTotalPrice(itemDetail) {
         totalPrice += itemDetail[i].littlePrice;
         savePrice += itemDetail[i].discount;
     }
-    console.info({totalPrice:totalPrice, savePrice:savePrice});
     return {totalPrice:totalPrice, savePrice:savePrice};
 }
 
