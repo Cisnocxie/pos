@@ -3,37 +3,39 @@
 function printReceipt(tags) {
     let itemNum = countItemNum(tags);
     let itemDetail = getItemDetail(itemNum, loadAllItems());
-    getItemDiscount(itemDetail, loadPromotions());
-    countItemLittlePrice(itemDetail);
-    let price = countTotalPrice(itemDetail);
+    let addItemDiscount = getItemDiscount(itemDetail, loadPromotions());
+    let addItemLittlePrice = countItemLittlePrice(addItemDiscount);
+    let price = countTotalPrice(addItemLittlePrice);
     let totalPrice = price.totalPrice;
     let savePrice = price.savePrice;
-    console.log(makeReceipt(itemDetail, totalPrice, savePrice));
+    console.log(makeReceipt(addItemLittlePrice, totalPrice, savePrice));
 }
 
 function countItemNum(tags) {
     let itemNum = {};
-    for (let i = 0; i < tags.length; i++) {
+    let tagsCopy = JSON.parse(JSON.stringify(tags));
+    for (let i = 0; i < tagsCopy.length; i++) {
         let num = 1;
-        if (tags[i].indexOf('-') != -1) {
-            num = parseFloat(tags[i].slice(tags[i].indexOf('-') + 1));
-            tags[i] = tags[i].slice(0, tags[i].indexOf('-'));
+        if (tagsCopy[i].indexOf('-') != -1) {
+            num = parseFloat(tagsCopy[i].slice(tagsCopy[i].indexOf('-') + 1));
+            tagsCopy[i] = tagsCopy[i].slice(0, tagsCopy[i].indexOf('-'));
         }
-        if (!itemNum['\'' + tags[i] + '\'']) {
-            itemNum['\'' + tags[i] + '\''] = num;
+        if (!itemNum[tagsCopy[i]]) {
+            itemNum[tagsCopy[i]] = num;
         } else {
-            itemNum['\'' + tags[i] + '\''] += num;
+            itemNum[tagsCopy[i]] += num;
         }
     }
     console.info(itemNum);
     return itemNum;
 }
 
-function getItemDetail(itemNum, allItemDetail) {
+function getItemDetail(itemNum, allItems) {
     let itemDetail = [];
+    let allItemDetail = JSON.parse(JSON.stringify(allItems));
     for (let i = 0; i < allItemDetail.length; i++) {
-        if (itemNum['\'' + allItemDetail[i].barcode + '\'']) {
-            allItemDetail[i].num = itemNum['\'' + allItemDetail[i].barcode + '\''];
+        if (itemNum[allItemDetail[i].barcode]) {
+            allItemDetail[i].num = itemNum[allItemDetail[i].barcode];
             itemDetail.push(allItemDetail[i]);
         }
     }
@@ -42,27 +44,34 @@ function getItemDetail(itemNum, allItemDetail) {
 }
 
 function getItemDiscount(itemDetail, promotion) {
-    for (let i = 0; i < itemDetail.length; i++) {
+    let addItemDiscount = JSON.parse(JSON.stringify(itemDetail));
+    for (let i = 0; i < addItemDiscount.length; i++) {
         let promote = false;
         for (let j = 0; j < promotion[0].barcodes.length; j++) {
-            if (itemDetail[i].barcode === promotion[0].barcodes[j]) {
-                itemDetail[i].discount = itemDetail[i].price;
-                promote = true;
+            if (addItemDiscount[i].barcode === promotion[0].barcodes[j]) {
+                if (addItemDiscount[i].num > 2) {
+                    addItemDiscount[i].discount = addItemDiscount[i].price;
+                    promote = true;
+                }
             }
         }
         if (!promote) {
-            itemDetail[i].discount = 0;
+            addItemDiscount[i].discount = 0;
         }
     }
-    console.info(itemDetail);
+    console.info(addItemDiscount);
+    return addItemDiscount;
 }
 
-function countItemLittlePrice(itemDetail) {
-    for (let i = 0; i < itemDetail.length; i++) {
-        itemDetail[i].littlePrice = itemDetail[i].price * itemDetail[i].num - itemDetail[i].discount;
+function countItemLittlePrice(addItemDiscount) {
+    let addItemLittlePrice = JSON.parse(JSON.stringify(addItemDiscount));
+    for (let i = 0; i < addItemLittlePrice.length; i++) {
+        addItemLittlePrice[i].littlePrice = addItemLittlePrice[i].price * addItemLittlePrice[i].num - addItemLittlePrice[i].discount;
     }
-    console.info(itemDetail);
+    console.info(addItemLittlePrice);
+    return addItemLittlePrice;
 }
+
 function countTotalPrice(itemDetail) {
     let totalPrice = 0;
     let savePrice = 0;
@@ -73,6 +82,7 @@ function countTotalPrice(itemDetail) {
     console.info({totalPrice:totalPrice, savePrice:savePrice});
     return {totalPrice:totalPrice, savePrice:savePrice};
 }
+
 function makeReceipt(itemDetail, totalPrice, savePrice) {
     let receipt = '';
     receipt += '***<没钱赚商店>收据***\n';
