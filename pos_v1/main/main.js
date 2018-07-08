@@ -1,4 +1,8 @@
+// Write your cade below:
 'use strict';
+const fixtures = require('../spec/fixtures');
+const loadAllItems = fixtures.loadAllItems;
+const loadPromotions = fixtures.loadPromotions;
 
 function printReceipt(tags) {
     let itemNum = countItemNum(tags);
@@ -89,4 +93,13 @@ function makeReceipt(itemDetail, totalPrice, savePrice) {
     receipt += '节省：' + savePrice.toFixed(2) + '(元)\n';
     receipt += '**********************';
     return receipt;
+}
+
+module.exports = {
+    printReceipt,
+    countItemNum,
+    getItemDetail,
+    getItemDiscount,
+    countItemLittlePrice,
+    countTotalPrice
 }
